@@ -1,0 +1,32 @@
+version: '3.4'
+
+networks:
+  gym-dev:
+    driver: bridge
+
+services:
+
+  gym.asp:
+    container_name: gym-asp
+    image: ${DOCKER_REGISTRY-}gymasp
+    build:
+      context: .
+      dockerfile: Gym.ASP/Dockerfile
+    networks:
+      - gym-dev
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gym
+    networks:
+      - gym-dev
+    ports:
+      - 5432:5432
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
