@@ -58,14 +58,9 @@ namespace Gym.ASP.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("VisitId,ClientId,VisitDate")] Visit visit)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(visit);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "ClientId", visit.ClientId);
-            return View(visit);
+            _context.Add(visit);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Visits/Edit/5
@@ -97,28 +92,23 @@ namespace Gym.ASP.Views
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(visit);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!VisitExists(visit.VisitId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(visit);
+                await _context.SaveChangesAsync();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "ClientId", visit.ClientId);
-            return View(visit);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!VisitExists(visit.VisitId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Visits/Delete/5

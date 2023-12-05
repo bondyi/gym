@@ -55,13 +55,9 @@ namespace Gym.ASP.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TrainerId,PhoneNumber,HashPassword,HireDate,FirstName,LastName,BirthDate,Gender,Height,Weight")] Trainer trainer)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(trainer);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(trainer);
+            _context.Add(trainer);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Trainers/Edit/5
@@ -92,27 +88,23 @@ namespace Gym.ASP.Views
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(trainer);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TrainerExists(trainer.TrainerId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(trainer);
+                await _context.SaveChangesAsync();
             }
-            return View(trainer);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TrainerExists(trainer.TrainerId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Trainers/Delete/5

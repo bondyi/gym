@@ -30,3 +30,6 @@ services:
       - 5432:5432
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - gym-data:/var/lib/postgresql/data
+volumes:
+  gym-data: 

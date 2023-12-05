@@ -58,14 +58,9 @@ namespace Gym.ASP.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("SubscriptionId,ClientId,Name,PurchaseDate")] Subscription subscription)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(subscription);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "ClientId", subscription.ClientId);
-            return View(subscription);
+            _context.Add(subscription);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Subscriptions/Edit/5
@@ -92,33 +87,23 @@ namespace Gym.ASP.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SubscriptionId,ClientId,Name,PurchaseDate")] Subscription subscription)
         {
-            if (id != subscription.SubscriptionId)
+            try
             {
-                return NotFound();
+                _context.Update(subscription);
+                await _context.SaveChangesAsync();
             }
-
-            if (ModelState.IsValid)
+            catch (DbUpdateConcurrencyException)
             {
-                try
+                if (!SubscriptionExists(subscription.SubscriptionId))
                 {
-                    _context.Update(subscription);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!SubscriptionExists(subscription.SubscriptionId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "ClientId", subscription.ClientId);
-            return View(subscription);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Subscriptions/Delete/5

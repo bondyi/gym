@@ -60,15 +60,9 @@ namespace Gym.ASP.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FeedbackId,ClientId,TrainerId,Rating,Message,CreationDate")] Feedback feedback)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(feedback);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "ClientId", feedback.ClientId);
-            ViewData["TrainerId"] = new SelectList(_context.Trainers, "TrainerId", "TrainerId", feedback.TrainerId);
-            return View(feedback);
+            _context.Add(feedback);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Feedbacks/Edit/5
@@ -101,29 +95,23 @@ namespace Gym.ASP.Views
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(feedback);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FeedbackExists(feedback.FeedbackId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(feedback);
+                await _context.SaveChangesAsync();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "ClientId", feedback.ClientId);
-            ViewData["TrainerId"] = new SelectList(_context.Trainers, "TrainerId", "TrainerId", feedback.TrainerId);
-            return View(feedback);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FeedbackExists(feedback.FeedbackId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Feedbacks/Delete/5

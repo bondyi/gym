@@ -60,15 +60,9 @@ namespace Gym.ASP.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PaymentId,ClientId,ServiceId,PaymentDate,Amount")] Payment payment)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(payment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "ClientId", payment.ClientId);
-            ViewData["ServiceId"] = new SelectList(_context.Services, "ServiceId", "ServiceId", payment.ServiceId);
-            return View(payment);
+            _context.Add(payment);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Payments/Edit/5
@@ -101,29 +95,23 @@ namespace Gym.ASP.Views
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(payment);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PaymentExists(payment.PaymentId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(payment);
+                await _context.SaveChangesAsync();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "ClientId", payment.ClientId);
-            ViewData["ServiceId"] = new SelectList(_context.Services, "ServiceId", "ServiceId", payment.ServiceId);
-            return View(payment);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PaymentExists(payment.PaymentId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Payments/Delete/5

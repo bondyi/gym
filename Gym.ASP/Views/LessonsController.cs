@@ -58,14 +58,9 @@ namespace Gym.ASP.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LessonId,TrainerId,StartDate,EndDate")] Lesson lesson)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(lesson);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["TrainerId"] = new SelectList(_context.Trainers, "TrainerId", "TrainerId", lesson.TrainerId);
-            return View(lesson);
+            _context.Add(lesson);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Lessons/Edit/5
@@ -97,28 +92,23 @@ namespace Gym.ASP.Views
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(lesson);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LessonExists(lesson.LessonId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(lesson);
+                await _context.SaveChangesAsync();
             }
-            ViewData["TrainerId"] = new SelectList(_context.Trainers, "TrainerId", "TrainerId", lesson.TrainerId);
-            return View(lesson);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!LessonExists(lesson.LessonId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Lessons/Delete/5

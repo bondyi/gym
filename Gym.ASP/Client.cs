@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Gym.ASP;
+﻿namespace Gym.ASP;
 
 public partial class Client
 {

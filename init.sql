@@ -289,3 +289,21 @@ alter table visit
       references client (client_id)
       on delete restrict on update restrict;
 
+CREATE OR REPLACE FUNCTION after_payment_insert() RETURNS TRIGGER AS $$
+DECLARE
+    service_name VARCHAR;
+BEGIN
+    SELECT name INTO service_name FROM service WHERE service_id = NEW.service_id AND type = 'Subscription';
+    IF service_name IS NOT NULL THEN
+        INSERT INTO subscription (client_id, name, purchase_date)
+        VALUES (NEW.client_id, service_name, NEW.payment_date);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER after_payment_insert
+AFTER INSERT ON payment
+FOR EACH ROW EXECUTE FUNCTION after_payment_insert();
+
+
